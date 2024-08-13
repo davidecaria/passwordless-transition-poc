@@ -4,11 +4,11 @@ This repository offers a comprehensive overview of the passwordless transition p
 
 It is important to note that this deployment is a simplified version of a test environment with additional resources and configurations. Passwords, usernames, and ports are placeholders and should be changed before deploying the demo.
 
-## Reproduce the PoC
+## 1. Reproduce the PoC
 
 After cloning the repository the following actions should be performed in order to fully reproduce the demo environment. The objective is to follow a step by step procedure that allows to reproduce the same exact setup used for the project. The architecture is not a copy of the production one and it is designed to have the minimum elements to proceed in the transition.
 
-### Setting up the infrastructure
+### 1.1 Setting up the infrastructure
 
 To lay the ground for the upcoming implementation, we need a complete infrastructure that will be configured and setup later. Specifically, we need three logic apps, one sql server and one sql database that runs on it, one virtual machine and a properly configured network environment.
 
@@ -32,7 +32,7 @@ To lay the ground for the upcoming implementation, we need a complete infrastruc
 
 ![alt text](./images/infra-deployment-passwordless-transition-poc.png "Complete infrastructure deployment")
 
-### Assign proper permissions and finalize configuration
+### 1.2 Assign proper permissions and finalize configuration
 
 To complete the infrastructure setup, we need to configure the logic apps and sql server to have the right permissions and connections. Logic apps will interact with Entra ID users and will log operations in the sql database. 
 
@@ -49,3 +49,13 @@ The SQL Database needs to be configured to host data in the proper format and al
 3. Review in the portal the correct assignment of the permissions and roles. In case of errors, refer to the specific powershell script in the "tools" folder.
 
 4. To complete the SQL setup, connect to the main database and run the scripts on **sql** folder of the **configuration**.
+
+### 1.3 Configure the transition manager
+
+To properly setup the logic to transition the users to passwordless transition we have to create a workflow for each logic app. The workflows hold the code to act on the users, groups, log information and external connections.
+
+1. Set up each logic app with a stateful workflow. In Azure, it looks as follows:
+
+![alt text](./images/pt-la-01-workflow-creation.png "Stateful workflow creation")
+
+2. Insert in each workflow code space, the proper script contained in the **transition-management** folder. Follow the numbering in the folder, Logic app 1 has to hold the code of the first workflow and so on.

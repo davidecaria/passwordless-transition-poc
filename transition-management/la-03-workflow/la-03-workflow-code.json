@@ -1,0 +1,482 @@
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "For_each": {
+                "actions": {
+                    "Condition": {
+                        "actions": {
+                            "For_each_1": {
+                                "actions": {
+                                    "Condition_1": {
+                                        "actions": {
+                                            "HTTP_-_Move_user_to_Uncommitted_group": {
+                                                "inputs": {
+                                                    "authentication": {
+                                                        "audience": "https://graph.microsoft.com",
+                                                        "type": "ManagedServiceIdentity"
+                                                    },
+                                                    "body": {
+                                                        "members@odata.bind": [
+                                                            "https://graph.microsoft.com/v1.0/directoryObjects/@{body('Parse_JSON_-_Parse_single_user')?['id']}"
+                                                        ]
+                                                    },
+                                                    "method": "PATCH",
+                                                    "uri": "https://graph.microsoft.com/v1.0/groups/d5ec0ace-9882-407e-a72a-e00e052313b7"
+                                                },
+                                                "runAfter": {
+                                                    "HTTP_-_Remove_previous_TAP": [
+                                                        "SUCCEEDED"
+                                                    ]
+                                                },
+                                                "runtimeConfiguration": {
+                                                    "contentTransfer": {
+                                                        "transferMode": "Chunked"
+                                                    }
+                                                },
+                                                "type": "Http"
+                                            },
+                                            "HTTP_-_Remove_previous_TAP": {
+                                                "inputs": {
+                                                    "authentication": {
+                                                        "audience": "https://graph.microsoft.com",
+                                                        "type": "ManagedServiceIdentity"
+                                                    },
+                                                    "method": "DELETE",
+                                                    "uri": "https://graph.microsoft.com/v1.0/users/@{body('Parse_JSON_-_Parse_single_user')?['id']}/authentication/temporaryAccessPassMethods/@{item()['id']}"
+                                                },
+                                                "runAfter": {
+                                                    "HTTP_-_Remove_user_from_Staged_group_2": [
+                                                        "SUCCEEDED"
+                                                    ]
+                                                },
+                                                "runtimeConfiguration": {
+                                                    "contentTransfer": {
+                                                        "transferMode": "Chunked"
+                                                    }
+                                                },
+                                                "type": "Http"
+                                            },
+                                            "HTTP_-_Remove_user_from_Staged_group_2": {
+                                                "inputs": {
+                                                    "authentication": {
+                                                        "audience": "https://graph.microsoft.com",
+                                                        "type": "ManagedServiceIdentity"
+                                                    },
+                                                    "method": "DELETE",
+                                                    "uri": "https://graph.microsoft.com/v1.0/groups/67932143-1fa6-4d7a-bb96-0f7ed1fed364/members/@{body('Parse_JSON_-_Parse_single_user')?['id']}/$ref"
+                                                },
+                                                "runtimeConfiguration": {
+                                                    "contentTransfer": {
+                                                        "transferMode": "Chunked"
+                                                    }
+                                                },
+                                                "type": "Http"
+                                            }
+                                        },
+                                        "else": {
+                                            "actions": {}
+                                        },
+                                        "expression": {
+                                            "and": [
+                                                {
+                                                    "equals": [
+                                                        "@items('For_each_1')['methodUsabilityReason']",
+                                                        "Expired"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "type": "If"
+                                    }
+                                },
+                                "foreach": "@outputs('Parse_JSON_-_TAP_details')['body']",
+                                "runAfter": {
+                                    "Parse_JSON_-_TAP_details": [
+                                        "SUCCEEDED"
+                                    ]
+                                },
+                                "type": "foreach"
+                            },
+                            "HTTP_-_Retrieve_TAP": {
+                                "inputs": {
+                                    "authentication": {
+                                        "audience": "https://graph.microsoft.com",
+                                        "type": "ManagedServiceIdentity"
+                                    },
+                                    "method": "GET",
+                                    "uri": "https://graph.microsoft.com/v1.0/users/@{items('For_each')?['id']}/authentication/temporaryAccessPassMethods"
+                                },
+                                "runtimeConfiguration": {
+                                    "contentTransfer": {
+                                        "transferMode": "Chunked"
+                                    }
+                                },
+                                "type": "Http"
+                            },
+                            "Parse_JSON_-_List_of_TAPs": {
+                                "inputs": {
+                                    "content": "@body('HTTP_-_Retrieve_TAP')",
+                                    "schema": {
+                                        "properties": {
+                                            "@@microsoft.graph.tips": {
+                                                "type": "string"
+                                            },
+                                            "@@odata.context": {
+                                                "type": "string"
+                                            },
+                                            "value": {
+                                                "type": "array"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "runAfter": {
+                                    "HTTP_-_Retrieve_TAP": [
+                                        "SUCCEEDED"
+                                    ]
+                                },
+                                "type": "ParseJson"
+                            },
+                            "Parse_JSON_-_TAP_details": {
+                                "inputs": {
+                                    "content": "@body('Parse_JSON_-_List_of_TAPs')?['value']",
+                                    "schema": {
+                                        "items": {
+                                            "properties": {
+                                                "createdDateTime": {
+                                                    "type": "string"
+                                                },
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "isUsable": {
+                                                    "type": "boolean"
+                                                },
+                                                "isUsableOnce": {
+                                                    "type": "boolean"
+                                                },
+                                                "lifetimeInMinutes": {
+                                                    "type": "integer"
+                                                },
+                                                "methodUsabilityReason": {
+                                                    "type": "string"
+                                                },
+                                                "startDateTime": {
+                                                    "type": "string"
+                                                },
+                                                "temporaryAccessPass": {}
+                                            },
+                                            "required": [
+                                                "id",
+                                                "isUsable",
+                                                "methodUsabilityReason",
+                                                "temporaryAccessPass",
+                                                "createdDateTime",
+                                                "startDateTime",
+                                                "lifetimeInMinutes",
+                                                "isUsableOnce"
+                                            ],
+                                            "type": "object"
+                                        },
+                                        "type": "array"
+                                    }
+                                },
+                                "runAfter": {
+                                    "Parse_JSON_-_List_of_TAPs": [
+                                        "SUCCEEDED"
+                                    ]
+                                },
+                                "type": "ParseJson"
+                            }
+                        },
+                        "else": {
+                            "actions": {
+                                "HTTP_-_Move_user_to_Committed_group": {
+                                    "inputs": {
+                                        "authentication": {
+                                            "audience": "https://graph.microsoft.com",
+                                            "type": "ManagedServiceIdentity"
+                                        },
+                                        "body": {
+                                            "members@odata.bind": [
+                                                "https://graph.microsoft.com/v1.0/directoryObjects/@{body('Parse_JSON_-_Parse_single_user')?['id']}"
+                                            ]
+                                        },
+                                        "method": "PATCH",
+                                        "uri": "https://graph.microsoft.com/v1.0/groups/15a9bdd6-924c-494e-ac6f-46a5e268213a"
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "Http"
+                                },
+                                "HTTP_-_Remove_user_from_Staged_group": {
+                                    "inputs": {
+                                        "authentication": {
+                                            "audience": "https://graph.microsoft.com",
+                                            "type": "ManagedServiceIdentity"
+                                        },
+                                        "method": "DELETE",
+                                        "uri": "https://graph.microsoft.com/v1.0/groups/d5ec0ace-9882-407e-a72a-e00e052313b7/members/@{body('Parse_JSON_-_Parse_single_user')?['id']}/$ref"
+                                    },
+                                    "runAfter": {
+                                        "HTTP_-_Move_user_to_Committed_group": [
+                                            "SUCCEEDED"
+                                        ]
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    },
+                                    "type": "Http"
+                                }
+                            }
+                        },
+                        "expression": {
+                            "and": [
+                                {
+                                    "equals": [
+                                        "@length(body('Parse_JSON_-_List_of_FIDO2_Methods')?['value'])",
+                                        0
+                                    ]
+                                }
+                            ]
+                        },
+                        "runAfter": {
+                            "Parse_JSON_-_List_of_FIDO2_Methods": [
+                                "SUCCEEDED"
+                            ]
+                        },
+                        "type": "If"
+                    },
+                    "HTTP_-_Retrieve_FIDO2_Methods": {
+                        "inputs": {
+                            "authentication": {
+                                "audience": "https://graph.microsoft.com",
+                                "type": "ManagedServiceIdentity"
+                            },
+                            "method": "GET",
+                            "uri": "https://graph.microsoft.com/v1.0/users/@{body('Parse_JSON_-_Parse_single_user')?['id']}/authentication/fido2Methods"
+                        },
+                        "runAfter": {
+                            "Parse_JSON_-_Parse_single_user": [
+                                "SUCCEEDED"
+                            ]
+                        },
+                        "runtimeConfiguration": {
+                            "contentTransfer": {
+                                "transferMode": "Chunked"
+                            }
+                        },
+                        "type": "Http"
+                    },
+                    "Parse_JSON_-_List_of_FIDO2_Methods": {
+                        "inputs": {
+                            "content": "@body('HTTP_-_Retrieve_FIDO2_Methods')",
+                            "schema": {
+                                "properties": {
+                                    "@@microsoft.graph.tips@": {
+                                        "type": "string"
+                                    },
+                                    "@@odata.context": {
+                                        "type": "string"
+                                    },
+                                    "value": {
+                                        "type": "array"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "runAfter": {
+                            "HTTP_-_Retrieve_FIDO2_Methods": [
+                                "SUCCEEDED"
+                            ]
+                        },
+                        "type": "ParseJson"
+                    },
+                    "Parse_JSON_-_Parse_single_user": {
+                        "inputs": {
+                            "content": "@items('For_each')",
+                            "schema": {
+                                "properties": {
+                                    "@@odata.type": {
+                                        "type": "string"
+                                    },
+                                    "businessPhones": {
+                                        "type": "array"
+                                    },
+                                    "displayName": {},
+                                    "givenName": {},
+                                    "id": {
+                                        "type": "string"
+                                    },
+                                    "jobTitle": {},
+                                    "mail": {},
+                                    "mobilePhone": {},
+                                    "officeLocation": {},
+                                    "preferredLanguage": {},
+                                    "surname": {},
+                                    "userPrincipalName": {}
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "ParseJson"
+                    }
+                },
+                "foreach": "@body('Parse_JSON_-_Parse_list_of_users_2')",
+                "runAfter": {
+                    "Parse_JSON_-_Parse_list_of_users_2": [
+                        "SUCCEEDED"
+                    ]
+                },
+                "type": "Foreach"
+            },
+            "HTTP_-_Get_Members_from_Staged_Group": {
+                "inputs": {
+                    "authentication": {
+                        "audience": "https://graph.microsoft.com",
+                        "type": "ManagedServiceIdentity"
+                    },
+                    "method": "GET",
+                    "uri": "https://graph.microsoft.com/v1.0/groups/67932143-1fa6-4d7a-bb96-0f7ed1fed364/members"
+                },
+                "runAfter": {},
+                "runtimeConfiguration": {
+                    "contentTransfer": {
+                        "transferMode": "Chunked"
+                    }
+                },
+                "type": "Http"
+            },
+            "Parse_JSON_-_Parse_list_of_users_": {
+                "inputs": {
+                    "content": "@body('HTTP_-_Get_Members_from_Staged_Group')",
+                    "schema": {
+                        "properties": {
+                            "@@odata.context": {
+                                "type": "string"
+                            },
+                            "value": {
+                                "items": {
+                                    "properties": {
+                                        "@@odata.type": {
+                                            "type": "string"
+                                        },
+                                        "businessPhones": {
+                                            "type": "array"
+                                        },
+                                        "displayName": {},
+                                        "givenName": {},
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "jobTitle": {},
+                                        "mail": {},
+                                        "mobilePhone": {},
+                                        "officeLocation": {},
+                                        "preferredLanguage": {},
+                                        "surname": {},
+                                        "userPrincipalName": {}
+                                    },
+                                    "required": [
+                                        "@@odata.type",
+                                        "id",
+                                        "businessPhones",
+                                        "displayName",
+                                        "givenName",
+                                        "jobTitle",
+                                        "mail",
+                                        "mobilePhone",
+                                        "officeLocation",
+                                        "preferredLanguage",
+                                        "surname",
+                                        "userPrincipalName"
+                                    ],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "runAfter": {
+                    "HTTP_-_Get_Members_from_Staged_Group": [
+                        "SUCCEEDED"
+                    ]
+                },
+                "type": "ParseJson"
+            },
+            "Parse_JSON_-_Parse_list_of_users_2": {
+                "inputs": {
+                    "content": "@body('Parse_JSON_-_Parse_list_of_users_')?['value']",
+                    "schema": {
+                        "items": {
+                            "properties": {
+                                "@@odata.type": {
+                                    "type": "string"
+                                },
+                                "businessPhones": {
+                                    "type": "array"
+                                },
+                                "displayName": {},
+                                "givenName": {},
+                                "id": {
+                                    "type": "string"
+                                },
+                                "jobTitle": {},
+                                "mail": {},
+                                "mobilePhone": {},
+                                "officeLocation": {},
+                                "preferredLanguage": {},
+                                "surname": {},
+                                "userPrincipalName": {}
+                            },
+                            "required": [
+                                "@@odata.type",
+                                "id",
+                                "businessPhones",
+                                "displayName",
+                                "givenName",
+                                "jobTitle",
+                                "mail",
+                                "mobilePhone",
+                                "officeLocation",
+                                "preferredLanguage",
+                                "surname",
+                                "userPrincipalName"
+                            ],
+                            "type": "object"
+                        },
+                        "type": "array"
+                    }
+                },
+                "runAfter": {
+                    "Parse_JSON_-_Parse_list_of_users_": [
+                        "SUCCEEDED"
+                    ]
+                },
+                "type": "ParseJson"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "triggers": {
+            "Recurrence": {
+                "recurrence": {
+                    "frequency": "Minute",
+                    "interval": 2
+                },
+                "type": "Recurrence"
+            }
+        }
+    },
+    "kind": "Stateful"
+}
