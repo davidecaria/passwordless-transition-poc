@@ -6,12 +6,13 @@ It is important to note that this deployment is a simplified version of a test e
 
 ## Reproduce the PoC
 
-After cloning the repository the following actions should be performed in order to fully reproduce the demo environment
+After cloning the repository the following actions should be performed in order to fully reproduce the demo environment. The objective is to follow a step by step procedure that allows to reproduce the same exact setup used for the project. The architecture is not a copy of the production one and it is designed to have the minimum elements to proceed in the transition.
 
 ### Setting up the infrastructure
 
-1. Create a **config.json** file in the **sql-infra** folder and fill it your values for:
+To lay the ground for the upcoming implementation, we need a complete infrastructure that will be configured and setup later. Specifically, we need three logic apps, one sql server and one sql database that runs on it, one virtual machine and a properly configured network environment.
 
+1. Create a **config.json** file in the **sql-infra** folder and fill it your values for:
 
     {
         "subscriptionId": "sub_id",
@@ -31,3 +32,18 @@ After cloning the repository the following actions should be performed in order 
 
 ![alt text](./images/infra-deployment-passwordless-transition-poc.png "Complete infrastructure deployment")
 
+### Assign proper permissions and finalize configuration
+
+To complete the infrastructure setup, we need to configure the logic apps and sql server to have the right permissions and connections. Logic apps will interact with Entra ID users and will log operations in the sql database. 
+
+Logic apps are similar to users and groups for Entra ID, meaning that we can assign permissions to roles to each one of them. As they deliver different function, their permissions are specific to the single workload. 
+
+The SQL Database needs to be configured to host data in the proper format and allow secure connections with the logic apps.
+
+1. Verify the presence of the logic apps in the **Enterprise application** menu in the Entra ID portal. They should look like this:
+
+![alt text](./images/enterprise-app-registration.png "Enterprise application registration")
+
+2. Modify with the correct TenantID and run the powershell scripts: permissions-la-01-staging-users.ps1, permissions-la-02-TAP-delivery.ps1, permissions-la-03-committing-users.ps1.
+
+3. Review in the portal the correct assignment of the permissions
