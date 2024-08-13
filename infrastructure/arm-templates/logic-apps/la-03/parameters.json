@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "value": "<@sub_id>"
+        },
+        "name": {
+            "value": "pt-la-03-fromStagedToCommitted"
+        },
+        "location": {
+            "value": "East US 2"
+        },
+        "ftpsState": {
+            "value": "FtpsOnly"
+        },
+        "storageAccountName": {
+            "value": "passwordlesstransita8ca"
+        },
+        "use32BitWorkerProcess": {
+            "value": false
+        },
+        "netFrameworkVersion": {
+            "value": "v6.0"
+        },
+        "hostingPlanName": {
+            "value": "ASP-passwordlesstransitionpocdeploy-9034"
+        },
+        "serverFarmResourceGroup": {
+            "value": "passwordless-transition-poc-deployment"
+        },
+        "alwaysOn": {
+            "value": false
+        }
+    }
+}
