@@ -59,3 +59,5 @@ To properly setup the logic to transition the users to passwordless transition w
 ![alt text](./images/pt-la-01-workflow-creation.png "Stateful workflow creation")
 
 2. Insert in each workflow code space, the proper script contained in the **transition-management** folder. Follow the numbering in the folder, Logic app 1 has to hold the code of the first workflow and so on.
+
+3.
