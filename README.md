@@ -47,3 +47,5 @@ The SQL Database needs to be configured to host data in the proper format and al
 2. Modify with the correct TenantID and run the powershell scripts: permissions-la-01-staging-users.ps1, permissions-la-02-TAP-delivery.ps1, permissions-la-03-committing-users.ps1.
 
 3. Review in the portal the correct assignment of the permissions and roles. In case of errors, refer to the specific powershell script in the "tools" folder.
+
+4. To complete the SQL setup, connect to the main database and run the scripts on **sql** folder of the **configuration**.
