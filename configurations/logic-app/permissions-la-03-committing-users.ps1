@@ -1,4 +1,4 @@
-﻿$TenantID="14b88990-7a0c-460c-a357-ace4cb6c29da"
+﻿$TenantID="<tenant_id>"
 
 $GraphAppId = "00000003-0000-0000-c000-000000000000"
 
