@@ -1,0 +1,22 @@
+{
+    "type": "ServiceProvider",
+    "inputs": {
+      "parameters": {
+        "tableName": "[dbo].[logs_AIO]",
+        "setColumns": {
+          "time": "@{utcNow()}",
+          "user_id": "@{body('Parse_JSON_-_Parse_single_user')?['userPrincipalName']}",
+          "logicapp_id": "TAP-provisioning",
+          "op_code": "1",
+          "tap_id": "@{items('For_each_1')['id']}",
+          "start_datetime": "@{body('Parse_JSON')?['startDateTime']}",
+          "lifetime_minutes": "@{body('Parse_JSON')?['lifetimeInMinutes']}"
+        }
+      },
+      "serviceProviderConfiguration": {
+        "connectionName": "sql",
+        "operationId": "insertRow",
+        "serviceProviderId": "/serviceProviders/sql"
+      }
+    }
+  }

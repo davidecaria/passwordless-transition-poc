@@ -1,0 +1,27 @@
+{
+    "type": "ServiceProvider",
+    "inputs": {
+      "parameters": {
+        "tableName": "[dbo].[logs_AIO]",
+        "setColumns": {
+          "time": "@{utcNow()}\n",
+          "user_id": "@{body('Parse_JSON_-_Parse_single_user')?['userPrincipalName']}",
+          "logicapp_id": "fromStagedToCommitted",
+          "op_code": "2",
+          "tap_id": "null",
+          "start_datetime": "null",
+          "lifetime_minutes": "null"
+        }
+      },
+      "serviceProviderConfiguration": {
+        "connectionName": "sql",
+        "operationId": "insertRow",
+        "serviceProviderId": "/serviceProviders/sql"
+      }
+    },
+    "runAfter": {
+      "HTTP_-_Notify_successful_transition": [
+        "SUCCEEDED"
+      ]
+    }
+  }

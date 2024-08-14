@@ -60,4 +60,5 @@ To properly setup the logic to transition the users to passwordless transition w
 
 2. Insert in each workflow code space, the proper script contained in the **transition-management** folder. Follow the numbering in the folder, Logic app 1 has to hold the code of the first workflow and so on.
 
-3.
+3. Complete the logic app with the preferred connection type to the database. For this demo environment a standard connection string to the SQL database will be enough. The modules are found in each workflow folder. The **runAfter** section of the json shows the suggested position of the code snippet, however, it is not mandatory and it can be changed as needed. 
+

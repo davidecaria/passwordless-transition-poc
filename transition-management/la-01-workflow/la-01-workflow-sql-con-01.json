@@ -1,0 +1,24 @@
+{
+    "type": "ServiceProvider",
+    "inputs": {
+      "parameters": {
+        "tableName": "[dbo].[fromUncommittedToStaged]",
+        "setColumns": {
+          "time": "@{utcNow()}",
+          "user_id": "@{body('Parse_JSON_-_Parse_single_user')?['userPrincipalName']}",
+          "logicapp_id": "pt-la-fromUncommittedToStaged",
+          "sequence_number": "0"
+        }
+      },
+      "serviceProviderConfiguration": {
+        "connectionName": "sql-1",
+        "operationId": "insertRow",
+        "serviceProviderId": "/serviceProviders/sql"
+      }
+    },
+    "runAfter": {
+      "HTTP_-_Remove_user_from_Uncommitted_group": [
+        "SUCCEEDED"
+      ]
+    }
+  }
