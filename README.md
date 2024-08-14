@@ -98,5 +98,22 @@ Finally, if needed, setup the notification service via email. Each workflow fold
 
 To properly setup the DMU component, we need to configure the devices and ship a detection script to each machine.
 
+#### Step 1
+As a first step, it may be useful to automatically enroll devices in Intune. Every machine that join the Azure Active Directory will be eligible for the deployment of the scripts. In Intune, it should look as follows:
+
+![alt text](./images/automatic-entrollment.png "Intune automatic enrolment")
+
+#### Step 2
+Build an **.intunewin** file that represents the Win32 app file for our demo. This file will include the following elements:
+
+- detection script
+- install script
+- uninstall script
+- session-logoff task
+- key-presence-detector script
+
+
+
+
 
 
