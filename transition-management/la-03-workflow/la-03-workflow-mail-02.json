@@ -1,0 +1,39 @@
+{
+    "type": "Http",
+    "inputs": {
+      "uri": "https://graph.microsoft.com/v1.0/users/<sending_user>/sendMail",
+      "method": "POST",
+      "body": {
+        "message": {
+          "subject": "Failed transition for user @{body('Parse_JSON_-_Parse_single_user')?['id']} ",
+          "body": {
+            "contentType": "Text",
+            "content": "The user @{body('Parse_JSON_-_Parse_single_user')?['id']} has failed to setup the FIDO2 Key within the expiration period of the TAP. Moving the user back to uncommitted group."
+          },
+          "toRecipients": [
+            {
+              "emailAddress": {
+                "address": "<receiving_user>"
+              }
+            }
+          ],
+          "ccRecipients": []
+        },
+        "saveToSentItems": "false"
+      },
+      "authentication": {
+        "type": "ManagedServiceIdentity",
+        "audience": "https://graph.microsoft.com"
+      }
+    },
+    "runAfter": {
+      "HTTP_-_Move_user_to_Uncommitted_group": [
+        "SUCCEEDED"
+      ]
+    },
+    "runtimeConfiguration": {
+      "contentTransfer": {
+        "transferMode": "Chunked"
+      }
+    }
+  }

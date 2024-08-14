@@ -1,0 +1,39 @@
+{
+    "type": "Http",
+    "inputs": {
+      "uri": "https://graph.microsoft.com/v1.0/users/<sending_user>/sendMail",
+      "method": "POST",
+      "body": {
+        "message": {
+          "subject": "Successful transition for user @{body('Parse_JSON_-_Parse_single_user')?['id']} ",
+          "body": {
+            "contentType": "Text",
+            "content": "The user @{body('Parse_JSON_-_Parse_single_user')?['id']} has successfully setup the FIDO2 Key Moving the user forward to committed group."
+          },
+          "toRecipients": [
+            {
+              "emailAddress": {
+                "address": "<receiving_user>"
+              }
+            }
+          ],
+          "ccRecipients": []
+        },
+        "saveToSentItems": "false"
+      },
+      "authentication": {
+        "type": "ManagedServiceIdentity",
+        "audience": "https://graph.microsoft.com"
+      }
+    },
+    "runAfter": {
+      "HTTP_-_Remove_user_from_Staged_group": [
+        "SUCCEEDED"
+      ]
+    },
+    "runtimeConfiguration": {
+      "contentTransfer": {
+        "transferMode": "Chunked"
+      }
+    }
+  }

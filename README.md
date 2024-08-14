@@ -88,4 +88,5 @@ If not previously configured, the logic app will not have direct access to the d
 
 It is sufficient to insert the displayed IP address in the networking blade of the SQL server. Alternatively, it is possible to set up an exception for Azure services and resources coming from the same subscription.
 
-
+#### Step 4
+Finally, if needed, setup the notification service via email. Each workflow folder contains the necessary code to be added to the main code base, in this PoC only the second and third logic app leverage email communication. Make sure to deploy a **communication service** that copes with your communication needs.
