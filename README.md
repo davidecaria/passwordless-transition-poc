@@ -12,7 +12,8 @@ After cloning the repository the following actions should be performed in order 
 
 To lay the ground for the upcoming implementation, we need a complete infrastructure that will be configured and setup later. Specifically, we need three logic apps, one sql server and one sql database that runs on it, one virtual machine and a properly configured network environment.
 
-1. Create a **config.json** file in the **sql-infra** folder and fill it your values for:
+#### Step 1
+Create a **config.json** file in the **sql-infra** folder and fill it your values for:
 
     {
         "subscriptionId": "sub_id",
@@ -26,9 +27,11 @@ To lay the ground for the upcoming implementation, we need a complete infrastruc
         "administratorLoginPassword":"strong_password"
     }
 
-2. Fill the logic apps **template.json** and **parameters.json** file with your subscription ID 
+#### Step 2
+Fill the logic apps **template.json** and **parameters.json** file with your subscription ID 
 
-3. Run the **main-infra.sh** to reproduce the following architecture:
+#### Step 3
+Run the **main-infra.sh** to reproduce the following architecture:
 
 ![alt text](./images/infra-deployment-passwordless-transition-poc.png "Complete infrastructure deployment")
 
@@ -40,25 +43,49 @@ Logic apps are similar to users and groups for Entra ID, meaning that we can ass
 
 The SQL Database needs to be configured to host data in the proper format and allow secure connections with the logic apps.
 
-1. Verify the presence of the logic apps in the **Enterprise application** menu in the Entra ID portal. They should look like this:
+#### Step 1
+Verify the presence of the logic apps in the **Enterprise application** menu in the Entra ID portal. They should look like this:
 
 ![alt text](./images/enterprise-app-registration.png "Enterprise application registration")
 
-2. Modify with the correct TenantID and run the powershell scripts: permissions-la-01-staging-users.ps1, permissions-la-02-TAP-delivery.ps1, permissions-la-03-committing-users.ps1.
+#### Step 2
+Modify with the correct TenantID and run the powershell scripts: permissions-la-01-staging-users.ps1, permissions-la-02-TAP-delivery.ps1, permissions-la-03-committing-users.ps1.
 
-3. Review in the portal the correct assignment of the permissions and roles. In case of errors, refer to the specific powershell script in the "tools" folder.
+#### Step 3
+Review in the portal the correct assignment of the permissions and roles. In case of errors, refer to the specific powershell script in the "tools" folder.
 
-4. To complete the SQL setup, connect to the main database and run the scripts on **sql** folder of the **configuration**.
+#### Step 4
+To complete the SQL setup, connect to the main database and run the scripts on **sql** folder of the **configuration**.
 
 ### 1.3 Configure the transition manager
 
 To properly setup the logic to transition the users to passwordless transition we have to create a workflow for each logic app. The workflows hold the code to act on the users, groups, log information and external connections.
 
-1. Set up each logic app with a stateful workflow. In Azure, it looks as follows:
+#### Step 1
+Set up each logic app with a stateful workflow. In Azure, it looks as follows:
 
 ![alt text](./images/pt-la-01-workflow-creation.png "Stateful workflow creation")
 
-2. Insert in each workflow code space, the proper script contained in the **transition-management** folder. Follow the numbering in the folder, Logic app 1 has to hold the code of the first workflow and so on.
+#### Step 2
+Insert in each workflow code space, the proper script contained in the **transition-management** folder. Follow the numbering in the folder, Logic app 1 has to hold the code of the first workflow and so on.
 
-3. Complete the logic app with the preferred connection type to the database. For this demo environment a standard connection string to the SQL database will be enough. The modules are found in each workflow folder. The **runAfter** section of the json shows the suggested position of the code snippet, however, it is not mandatory and it can be changed as needed. 
+#### Step 3
+Add to the logic app the preferred connection type to the database. For this demo environment a standard connection string to the SQL database will be enough. The modules are found in each workflow folder. The **runAfter** section of the json shows the suggested position of the code snippet, however, it is not mandatory and it can be changed as needed. 
+
+The configuration of the SQL connection in the logic app should look as follows:
+
+![alt text](./images/pt-la-01-sqlcon-setup.png "SQL Database connection setup")
+
+The connection method can be chosen, for this example, the connection string retried in the sql database page will work.
+
+```
+Server=tcp:pt-azuresqlserver.database.windows.net,1433;Initial Catalog=pt-azuresqldatabase-log;Persist Security Info=False;User ID=azuresqlserver-admin;Password={your_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+```
+
+If not previously configured, the logic app will not have direct access to the database. This is because the firewall on the SQL server denies connections from unknown ips by default. We can see this behavior in action as follows:
+
+![alt text](./images/pt-la-01-sqlcon-setup2.png "SQL Database connection setup")
+
+It is sufficient to insert the displayed IP address in the networking blade of the SQL server. Alternatively, it is possible to set up an exception for Azure services and resources coming from the same subscription.
+
 
