@@ -57,9 +57,12 @@ Review in the portal the correct assignment of the permissions and roles. In cas
 #### Step 4
 To complete the SQL setup, connect to the main database and run the scripts on **sql** folder of the **configuration**.
 
+#### Step 5
+Configure the required Entra ID groups for the following unit. A demo example is provided as **groups-setup.ps1**.
+
 ### 1.3 Configure the transition management unit (TMU)
 
-To properly setup the logic to transition the users to passwordless transition we have to create a workflow for each logic app. The workflows hold the code to act on the users, groups, log information and external connections.
+To properly setup the logic to transition the users to passwordless authentication we have to create a workflow for each logic app. The workflows hold the code to act on the users, groups, log information and external connections.
 
 #### Step 1
 Set up each logic app with a stateful workflow. In Azure, it looks as follows:
@@ -92,4 +95,8 @@ It is sufficient to insert the displayed IP address in the networking blade of t
 Finally, if needed, setup the notification service via email. Each workflow folder contains the necessary code to be added to the main code base, in this PoC only the second and third logic app leverage email communication. Make sure to deploy a **communication service** that copes with your communication needs.
 
 ### 1.4 Configure the device management unit (DMU)
+
+To properly setup the DMU component, we need to configure the devices and ship a detection script to each machine.
+
+
 
