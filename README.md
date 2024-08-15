@@ -112,8 +112,21 @@ Build an **.intunewin** file that represents the Win32 app file for our demo. Th
 - session-logoff task
 - key-presence-detector script
 
+Before building the Intune package, the best option is to compile the key-presence-detector.ps1 into an executable file for the specific operating system that will receive it. 
+Subsequently, with the use of the official Microsoft Tool, is is possible to package the files into a **.intunewin**.
+
+[text](https://github.com/Microsoft/Microsoft-Win32-Content-Prep-Tool)
 
 
+#### Step 3
+Upload the Win32 app to Intune and set the relevant properties as follows:
+
+- Source file: your_file.intunewin
+- Install command: powershell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -NonInteractive -File .\install.ps1
+- Uninstall command: powershell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Hidden -NonInteractive -File .\uninstall.ps1
+- Installation time required: 3 minutes
+- Install behavior: System
+- Operating system architecture: x86,x64
 
 
 
