@@ -115,7 +115,7 @@ Build an **.intunewin** file that represents the Win32 app file for our demo. Th
 Before building the Intune package, the best option is to compile the key-presence-detector.ps1 into an executable file for the specific operating system that will receive it. 
 Subsequently, with the use of the official Microsoft Tool, is is possible to package the files into a **.intunewin**.
 
-[text](https://github.com/Microsoft/Microsoft-Win32-Content-Prep-Tool)
+[Microsoft Win32 Content Prep Tool](https://github.com/Microsoft/Microsoft-Win32-Content-Prep-Tool)
 
 
 #### Step 3
