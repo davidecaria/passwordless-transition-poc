@@ -127,6 +127,3 @@ Upload the Win32 app to Intune and set the relevant properties as follows:
 - Installation time required: 3 minutes
 - Install behavior: System
 - Operating system architecture: x86,x64
-
-
-
