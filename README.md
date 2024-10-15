@@ -1,10 +1,24 @@
 # Passwordless Transition - Proof of Concept
 
-This repository offers a comprehensive overview of the passwordless transition process. It focuses on a Proof of Concept developed during an internship at Microsoft, aiming to serve as a reference for future implementations and migrations towards passwordless authentication in Azure.
+This repository provides the tools needed to set up a passwordless transition environment. It serves as the playground for a Proof of Concept developed during an internship at Microsoft and acts as a reference for future implementations and migrations towards passwordless authentication in Azure.
 
 It is important to note that this deployment is a simplified version of a test environment with additional resources and configurations. Passwords, usernames, and ports are placeholders and should be changed before deploying the demo.
 
-## 1. Reproduce the PoC
+## 1. Navigating the project
+
+The repository is organized for easy navigation, with the following structure:
+
+- configurations: Contains post-deployment configuration details. After deploying a component in Azure, this folder includes everything needed for further setup, ranging from user configurations to permissions and SQL queries.
+
+- device-management: Includes the Intune-related content of the Proof of Concept (PoC), such as detection and installation scripts, along with XML tasks to be configured in the task scheduler.
+
+- images: Contains all the visual sources for the guide.
+
+- tools: Provides a set of useful tools that can be used if needed. The guide indicates when to employ them, but they are optional and can be replaced with your preferred tools.
+
+- transition-management: Holds the configuration and codebase for the Logic Apps used in the transition process. 
+
+## 2. Reproduce the PoC
 
 After cloning the repository the following actions should be performed in order to fully reproduce the demo environment. The objective is to follow a step by step procedure that allows to reproduce the same exact setup used for the project. The architecture is not a copy of the production one and it is designed to have the minimum elements to proceed in the transition.
 
@@ -127,3 +141,9 @@ Upload the Win32 app to Intune and set the relevant properties as follows:
 - Installation time required: 3 minutes
 - Install behavior: System
 - Operating system architecture: x86,x64
+
+## 3. Costs and Billing
+
+The PoC is modular and the modules can be partially deployed to avoid exceeding the current Azure cost plan. The Azure Logic Apps are billed with a pay-as-you go module so for the purpose of testing it would be better to manually run them.
+The device management requires an Intune license or a package that includes it (E3 or E5 security).
+Integrating the logs with a SIEM may require additional costs. In the case of Microsoft Sentinel, a free license is sufficient to test the Proof of Concept. 
